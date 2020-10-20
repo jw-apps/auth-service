@@ -6,10 +6,10 @@ import de.johanneswirth.apps.authservice.AuthDAO;
 import de.johanneswirth.apps.authservice.PasswordUtils;
 import de.johanneswirth.apps.common.IStatus;
 import org.apache.commons.lang3.tuple.Pair;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.jdbi.v3.core.Jdbi;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -41,7 +41,7 @@ public class LoginService {
         } else {
             Pair<String, String> password = dao.getPasswordHash(user.username);
             if (utils.verifyUserPassword(user.password, password.getLeft(), password.getRight())) {
-                return OK(utils.generateJWTToken(dao.getID(user.username)), 0);
+                return OK(utils.generateJWTToken(dao.getID(user.username)));
             } else {
                 return AUTHENTICATION_ERROR;
             }

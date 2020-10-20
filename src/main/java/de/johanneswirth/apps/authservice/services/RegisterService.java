@@ -17,8 +17,8 @@ import javax.ws.rs.core.MediaType;
 
 import java.util.Optional;
 
-import static de.johanneswirth.apps.common.ErrorStatus.AUTHENTICATION_ERROR;
-import static de.johanneswirth.apps.common.ErrorStatus.INCORRECT_INVITATION;
+import static de.johanneswirth.apps.authservice.ErrorStatus.INCORRECT_INVITATION;
+import static de.johanneswirth.apps.authservice.ErrorStatus.USER_EXISTS;
 import static de.johanneswirth.apps.common.SuccessStatus.OK;
 
 @Path("register")
@@ -45,7 +45,7 @@ public class RegisterService {
     @ExceptionMetered
     public IStatus<String> register(@Valid @NotNull User user) {
         if (dao.userExists(user.username) != 0) {
-            return AUTHENTICATION_ERROR;
+            return USER_EXISTS;
         } else {
             Optional<Long> inviter = invitationDAO.checkInvitation(user.invitation);
             if (inviter.isPresent()) {
@@ -55,7 +55,7 @@ public class RegisterService {
                 dao.registerUser(user.username, user.email, password, salt);
                 long user_id = dao.getID(user.username);
                 friendsDAO.addFriend(user_id, inviter.get());
-                return OK(utils.generateJWTToken(user_id), 0);
+                return OK(utils.generateJWTToken(user_id));
             } else {
                 return INCORRECT_INVITATION;
             }

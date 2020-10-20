@@ -13,6 +13,6 @@ public interface InvitationDAO {
     @SqlUpdate("delete from invitations where invitation = :invitation")
     void deleteInvitation(String invitation);
 
-    @SqlUpdate("insert into invitations (invitation, user_id) VALUES (:invitation, :user_id)")
+    @SqlUpdate("insert into invitations (invitation, user_id) values (:invitation, :user_id)")
     void createInvitation(String invitation, long user_id);
 }

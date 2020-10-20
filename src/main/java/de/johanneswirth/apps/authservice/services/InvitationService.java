@@ -45,6 +45,6 @@ public class InvitationService {
         new Random().nextBytes(array);
         String generatedString = new String(array, StandardCharsets.UTF_8);
         dao.createInvitation(generatedString, Long.parseLong(securityContext.getUserPrincipal().getName()));
-        return OK(generatedString, System.currentTimeMillis());
+        return OK(generatedString);
     }
 }
