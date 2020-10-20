@@ -1,0 +1,107 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.bmuschko.docker-remote-api' version '6.6.1'
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+}
+
+mainClassName = 'de.johanneswirth.tac.gameserver.GameServerApp'
+
+group 'de.johannes-wirth'
+version '0.1'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+    mavenLocal()
+}
+
+
+
+
+dependencies {
+    compile group: 'io.dropwizard', name: 'dropwizard-core', version: '2.0.13'
+    compile group: 'io.dropwizard', name: 'dropwizard-jdbi3', version: '2.0.13'
+    compile group: 'io.dropwizard', name: 'dropwizard-auth', version: '2.0.13'
+    compile group: 'io.dropwizard', name: 'dropwizard-migrations', version: '2.0.13'
+    compile group: 'io.dropwizard', name: 'dropwizard-json-logging', version: '2.0.13'
+    compile group: 'de.johannes-wirth', name: 'apps-backend-common', version: '0.0.1'
+    compile 'com.auth0:java-jwt:3.11.0'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.22'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.7.0'
+}
+
+shadowJar {
+    mergeServiceFiles()
+    archiveClassifier = null
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+}
+
+jar {
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+    manifest { attributes 'Main-Class': mainClassName }
+}
+
+task copyScript(type: Copy) {
+    from file("startup.sh")
+    into file("build/docker/")
+}
+
+task copyScript2(type: Copy) {
+    from file("build/scripts/" + rootProject.name)
+    into file("build/docker/")
+}
+
+task copyJar(type: Copy) {
+    from file("build/libs/" + rootProject.name + "-" + version + ".jar")
+    into file("build/docker/")
+}
+
+task excludeLibraries(type: Delete) {
+    delete fileTree(dir: "build/docker/${rootProject.name}/lib")
+}
+
+import com.bmuschko.gradle.docker.tasks.image.*
+
+task createDockerfile(type: Dockerfile) {
+    from 'openjdk:11'
+    label(['maintainer': 'Johannes Wirth "johannes-wirth@posteo.de"'])
+    workingDir '/' + rootProject.name
+    addFile(rootProject.name, 'bin/' + rootProject.name)
+    addFile(rootProject.name + '-' + version + '.jar', 'lib/' + rootProject.name + '-' + version + '.jar')
+    exposePort(8080,8081)
+    entryPoint 'sh'
+    defaultCommand 'startup.sh'
+    addFile('startup.sh', 'startup.sh')
+}
+
+task buildImage(type: DockerBuildImage) {
+    dependsOn createDockerfile
+    images.add(rootProject.name + ":" + version)
+}
+
+buildImage.dependsOn excludeLibraries
+buildImage.dependsOn copyScript
+buildImage.dependsOn copyScript2
+buildImage.dependsOn copyJar
+buildImage.dependsOn build
+copyJar.dependsOn shadowJar
+
+task tagImage(type:DockerTagImage) {
+    dependsOn buildImage
+    targetImageId(rootProject.name + ':' + version)
+    tag.set 'latest'
+    repository.set 'jw78guro/apps-auth-service'
+}
+
+task publishImage(type:DockerPushImage) {
+    dependsOn tagImage
+    images.add 'jw78guro/apps-auth-service:latest'
+}
