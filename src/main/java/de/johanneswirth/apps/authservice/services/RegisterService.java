@@ -2,10 +2,7 @@ package de.johanneswirth.apps.authservice.services;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Timed;
-import de.johanneswirth.apps.authservice.AuthDAO;
-import de.johanneswirth.apps.authservice.FriendsDAO;
-import de.johanneswirth.apps.authservice.InvitationDAO;
-import de.johanneswirth.apps.authservice.PasswordUtils;
+import de.johanneswirth.apps.authservice.*;
 import de.johanneswirth.apps.common.IStatus;
 import org.jdbi.v3.core.Jdbi;
 
@@ -17,8 +14,8 @@ import javax.ws.rs.core.MediaType;
 
 import java.util.Optional;
 
-import static de.johanneswirth.apps.authservice.ErrorStatus.INCORRECT_INVITATION;
-import static de.johanneswirth.apps.authservice.ErrorStatus.USER_EXISTS;
+import static de.johanneswirth.apps.authservice.AuthError.INCORRECT_INVITATION;
+import static de.johanneswirth.apps.authservice.AuthError.USER_EXISTS;
 import static de.johanneswirth.apps.common.SuccessStatus.OK;
 
 @Path("register")
@@ -28,12 +25,14 @@ public class RegisterService {
     private InvitationDAO invitationDAO;
     private FriendsDAO friendsDAO;
     private PasswordUtils utils;
+    private AuthConfiguration config;
 
-    public RegisterService(Jdbi jdbi, PasswordUtils utils) {
+    public RegisterService(Jdbi jdbi, PasswordUtils utils, AuthConfiguration config) {
         this.dao = jdbi.onDemand(AuthDAO.class);
         this.invitationDAO = jdbi.onDemand(InvitationDAO.class);
         this.friendsDAO = jdbi.onDemand(FriendsDAO.class);
         this.utils = utils;
+        this.config = config;
     }
 
     @POST
@@ -56,6 +55,12 @@ public class RegisterService {
                 long user_id = dao.getID(user.username);
                 friendsDAO.addFriend(user_id, inviter.get());
                 return OK(utils.generateJWTToken(user_id));
+            } else if (!config.isRequireInvitation()) {
+                String salt = utils.getSalt(30);
+                String password = utils.generateSecurePassword(user.password, salt);
+                dao.registerUser(user.username, user.email, password, salt);
+                long user_id = dao.getID(user.username);
+                return OK(utils.generateJWTToken(user_id));
             } else {
                 return INCORRECT_INVITATION;
             }
@@ -72,7 +77,7 @@ public class RegisterService {
         public String email;
         @NotEmpty
         public String password;
-        @NotEmpty
+        @NotNull
         public String invitation;
 
         public User() { }

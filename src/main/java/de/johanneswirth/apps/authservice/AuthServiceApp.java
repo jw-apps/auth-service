@@ -47,7 +47,7 @@ public class AuthServiceApp extends Application<AuthConfiguration> {
         jdbi.registerRowMapper(new PairMapperFactory());
 
         environment.jersey().register(new LoginService(jdbi, utils));
-        environment.jersey().register(new RegisterService(jdbi, utils));
+        environment.jersey().register(new RegisterService(jdbi, utils, config));
         environment.jersey().register(new PasswordChangeService(jdbi, utils));
         environment.jersey().register(new PasswordRecoverService(jdbi, utils));
         environment.jersey().register(new ContainerFilter());

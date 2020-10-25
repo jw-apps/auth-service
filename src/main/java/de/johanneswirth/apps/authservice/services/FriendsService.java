@@ -18,8 +18,8 @@ import javax.ws.rs.core.SecurityContext;
 import java.util.List;
 import java.util.Optional;
 
-import static de.johanneswirth.apps.authservice.ErrorStatus.ALREADY_FRIENDS;
-import static de.johanneswirth.apps.authservice.ErrorStatus.FRIENDREQUEST_EXISTS;
+import static de.johanneswirth.apps.authservice.AuthError.ALREADY_FRIENDS;
+import static de.johanneswirth.apps.authservice.AuthError.FRIENDREQUEST_EXISTS;
 import static de.johanneswirth.apps.common.SuccessStatus.OK;
 import static de.johanneswirth.apps.common.Utils.userID;
 

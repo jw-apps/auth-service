@@ -15,6 +15,18 @@ public class AuthConfiguration extends Configuration {
     @NotEmpty
     private String privateKey;
 
+    private boolean requireInvitation = true;
+
+    @JsonProperty
+    public boolean isRequireInvitation() {
+        return requireInvitation;
+    }
+
+    @JsonProperty
+    public void setRequireInvitation(boolean requireInvitation) {
+        this.requireInvitation = requireInvitation;
+    }
+
     @JsonProperty
     public String getPublicKey() {
         return publicKey;

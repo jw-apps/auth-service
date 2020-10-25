@@ -21,7 +21,7 @@ public interface FriendsDAO {
     @SqlUpdate("insert into friendRequests (user_id_a, user_id_b) values (:user_a, :user_b)")
     void addFriendRequest(long user_a, long user_b);
 
-    @SqlUpdate("select user_id_b from friendRequests where user_id_a = :user_id_a and user_id_b = :user_id_b")
+    @SqlQuery("select user_id_b from friendRequests where user_id_a = :user_id_a and user_id_b = :user_id_b")
     Optional<Long> existsFriendRequest(long user_id_a, long user_id_b);
 
     @SqlUpdate("delete from friendRequests where user_id_a = :user_id_a and user_id_b = :user_id_b")

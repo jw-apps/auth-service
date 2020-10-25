@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-import static de.johanneswirth.apps.common.ErrorStatus.AUTHENTICATION_ERROR;
+import static de.johanneswirth.apps.common.CommonError.AUTHENTICATION_ERROR;
 import static de.johanneswirth.apps.common.SuccessStatus.OK;
 
 @Path("login")
