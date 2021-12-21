@@ -1,4 +1,4 @@
-package de.johanneswirth.apps.authservice;
+package de.johanneswirth.apps.auth;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;

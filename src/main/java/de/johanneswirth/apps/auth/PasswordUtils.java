@@ -1,4 +1,4 @@
-package de.johanneswirth.apps.authservice;
+package de.johanneswirth.apps.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -26,7 +26,7 @@ import java.util.Random;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-import static de.johanneswirth.apps.common.Utils.loadPublic;
+import static de.johanneswirth.apps.common.VerificationHelper.loadPublic;
 
 public class PasswordUtils implements Managed {
 
@@ -105,7 +105,7 @@ public class PasswordUtils implements Managed {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime exp = now.plusDays(7);
         String token = JWT.create()
-                .withIssuer("tac-server")
+                .withIssuer("app-center")
                 .withSubject(subject + "")
                 .withIssuedAt(toDate(now))
                 .withExpiresAt(toDate(exp))

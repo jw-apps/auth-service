@@ -1,4 +1,4 @@
-package de.johanneswirth.apps.authservice;
+package de.johanneswirth.apps.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -11,9 +11,7 @@ import javax.validation.constraints.NotNull;
 @JsonSerialize(using= ErrorSerializer.class)
 public enum AuthError implements Error {
     USER_EXISTS("USER_EXISTS", false),
-    INCORRECT_INVITATION("INCORRECT_INVITATION", false),
-    ALREADY_FRIENDS("ALREADY_FRIENDS"),
-    FRIENDREQUEST_EXISTS("FRIENDREQUEST_EXISTS");
+    INCORRECT_INVITATION("INCORRECT_INVITATION", false);
 
     @NotEmpty
     private String errorMessage;

@@ -1,4 +1,4 @@
-package de.johanneswirth.apps.authservice;
+package de.johanneswirth.apps.auth;
 
 import java.beans.ConstructorProperties;
 
